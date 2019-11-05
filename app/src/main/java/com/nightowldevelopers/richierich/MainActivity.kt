@@ -22,16 +22,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.nightowldevelopers.richierich.ui.home.HomeViewModel
-import com.nightowldevelopers.richierich.ui.notifications.NotificationsViewModel
-import kotlinx.android.synthetic.main.activity_main.*
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import androidx.core.app.NotificationCompat
 import com.nightowldevelopers.richierich.ui.notifications.NotificationsFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : BaseActivity(){
+class MainActivity : BaseActivity() {
     // [START declare_auth]
     private lateinit var auth: FirebaseAuth
     // [END declare_auth]
@@ -171,20 +166,26 @@ class MainActivity : BaseActivity(){
         if (user != null) {
             Log.d("TAG", "lOGGED IN")
             Log.d("Tag", user.displayName)
-            //  Log.d("Tag",user.phoneNumber)
+            Log.d("Tag", user.photoUrl.toString())
             Log.d("Tag", user.email)
-            var notificationsFragment= NotificationsFragment()
+            var notificationsFragment = NotificationsFragment()
             val bundle = Bundle()
-            bundle.putString("Name",user.displayName)
-            bundle.putString("Email",user.email)
-            notificationsFragment.arguments=bundle
+            /*bundle.putString("Name", user.displayName)
+            bundle.putString("Email", user.email)
+            bundle.putString("PhotoUrl", user.photoUrl.toString())*/
+            notificationsFragment.apply {
+                arguments=Bundle().apply {
+                    putString("Name", user.displayName)
+                    putString("Email", user.email)
+                    putString("PhotoUrl", user.photoUrl.toString())
+                }
+            }
 
 
-
-           /* var intent =Intent(applicationContext,NotificationsViewModel::)
-            intent.putExtra("Name",user.displayName)
-            intent.putExtra("Email",user.email)
-            startActivity(intent)*/
+            /* var intent =Intent(applicationContext,NotificationsViewModel::)
+             intent.putExtra("Name",user.displayName)
+             intent.putExtra("Email",user.email)
+             startActivity(intent)*/
             var homeViewModel: HomeViewModel
             homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel::class.java)

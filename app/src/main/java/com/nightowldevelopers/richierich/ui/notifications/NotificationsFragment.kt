@@ -22,8 +22,14 @@ class NotificationsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         //var Name = arguments?.getString("Name")
-        Log.d("Argument Value",arguments.toString())
-     //   var Name1 = arguments!!.getString("Name")
+        try {
+            Log.d("Argument Value",arguments.toString())
+            Log.d("Name",arguments?.getString("Name"))
+        } catch (e: Exception) {
+            Log.d("Error",e.message)
+        }
+
+//        var Name1 = arguments!!.getString("Name")
         notificationsViewModel =
             ViewModelProviders.of(this).get(NotificationsViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_notifications, container, false)
