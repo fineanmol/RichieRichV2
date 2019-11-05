@@ -1,38 +1,37 @@
 package com.nightowldevelopers.richierich
 
-import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.nightowldevelopers.richierich.ui.home.HomeViewModel
+import com.nightowldevelopers.richierich.ui.notifications.NotificationsViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_notifications.*
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import com.nightowldevelopers.richierich.ui.home.HomeViewModel
-import com.nightowldevelopers.richierich.ui.notifications.NotificationsViewModel
-import kotlinx.android.synthetic.*
+import androidx.core.app.NotificationCompat
+import com.nightowldevelopers.richierich.ui.notifications.NotificationsFragment
 
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(){
     // [START declare_auth]
     private lateinit var auth: FirebaseAuth
     // [END declare_auth]
@@ -123,12 +122,12 @@ class MainActivity : BaseActivity() {
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
                     updateUI(user)
-                    progressBar.visibility=View.GONE
+                    progressBar.visibility = View.GONE
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     //Snackbar.make(main_layout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
-                    progressBar.visibility=View.GONE
+                    progressBar.visibility = View.GONE
                     updateUI(null)
                 }
 
@@ -170,17 +169,32 @@ class MainActivity : BaseActivity() {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-            Log.d("TAG","lOGGED IN")
+            Log.d("TAG", "lOGGED IN")
+            Log.d("Tag", user.displayName)
+            //  Log.d("Tag",user.phoneNumber)
+            Log.d("Tag", user.email)
+            var notificationsFragment= NotificationsFragment()
+            val bundle = Bundle()
+            bundle.putString("Name",user.displayName)
+            bundle.putString("Email",user.email)
+            notificationsFragment.arguments=bundle
+
+
+
+           /* var intent =Intent(applicationContext,NotificationsViewModel::)
+            intent.putExtra("Name",user.displayName)
+            intent.putExtra("Email",user.email)
+            startActivity(intent)*/
             var homeViewModel: HomeViewModel
             homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel::class.java)
             val root = layoutInflater.inflate(R.layout.fragment_home, container, false)
             val textView: TextView = root.findViewById(R.id.text_home)
             homeViewModel.text.observe(this, Observer {
-                textView.text=user.email.toString()
+                textView.text = user.email.toString()
             })
 
-            progressBar.visibility=View.GONE
+            progressBar.visibility = View.GONE
         } else {
 
         }
