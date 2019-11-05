@@ -66,7 +66,7 @@ class MainActivity : BaseActivity() {
         auth = FirebaseAuth.getInstance()
         // [END initialize_auth]
 
-        signIn()
+       // signIn()
 
 
     }
@@ -143,7 +143,7 @@ class MainActivity : BaseActivity() {
 
     private fun signOut() {
         // Firebase sign out
-        auth.signOut()
+       // auth.signOut()
 
         // Google sign out
         googleSignInClient.signOut().addOnCompleteListener(this) {
@@ -153,7 +153,7 @@ class MainActivity : BaseActivity() {
 
     private fun revokeAccess() {
         // Firebase sign out
-        auth.signOut()
+        //auth.signOut()
 
         // Google revoke access
         googleSignInClient.revokeAccess().addOnCompleteListener(this) {
@@ -164,28 +164,12 @@ class MainActivity : BaseActivity() {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-            Log.d("TAG", "lOGGED IN")
+            /*Log.d("TAG", "lOGGED IN")
             Log.d("Tag", user.displayName)
             Log.d("Tag", user.photoUrl.toString())
-            Log.d("Tag", user.email)
-            var notificationsFragment = NotificationsFragment()
-            val bundle = Bundle()
-            /*bundle.putString("Name", user.displayName)
-            bundle.putString("Email", user.email)
-            bundle.putString("PhotoUrl", user.photoUrl.toString())*/
-            notificationsFragment.apply {
-                arguments=Bundle().apply {
-                    putString("Name", user.displayName)
-                    putString("Email", user.email)
-                    putString("PhotoUrl", user.photoUrl.toString())
-                }
-            }
+            Log.d("Tag", user.email)*/
 
 
-            /* var intent =Intent(applicationContext,NotificationsViewModel::)
-             intent.putExtra("Name",user.displayName)
-             intent.putExtra("Email",user.email)
-             startActivity(intent)*/
             var homeViewModel: HomeViewModel
             homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel::class.java)
