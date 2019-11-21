@@ -21,8 +21,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.IgnoreExtraProperties
 import com.nightowldevelopers.richierich.ui.home.HomeViewModel
-import com.nightowldevelopers.richierich.ui.notifications.NotificationsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -30,10 +32,13 @@ class MainActivity : BaseActivity() {
     // [START declare_auth]
     private lateinit var auth: FirebaseAuth
     // [END declare_auth]
+    private lateinit var database: DatabaseReference
+
 
     private lateinit var googleSignInClient: GoogleSignInClient
-
+    private val currentUser = FirebaseAuth.getInstance().currentUser
     override fun onCreate(savedInstanceState: Bundle?) {
+        database = FirebaseDatabase.getInstance().reference
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -51,36 +56,38 @@ class MainActivity : BaseActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // [START config_signin]
-        // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-        // [END config_signin]
-
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // [START initialize_auth]
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
-        // [END initialize_auth]
 
-       // signIn()
+     // signIn()
+        if (currentUser != null) {
+            var name = currentUser.displayName
+            var Email= currentUser.email
+            var ProfileUrl = currentUser.photoUrl
+            NewUser(
+                currentUser.displayName.toString(),
+                currentUser.email.toString(),
+                currentUser.photoUrl.toString()
+            )
+        }
 
 
     }
 
-    // [START on_start_check_user]
+
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         updateUI(currentUser)
     }
-    // [END on_start_check_user]
 
-    // [START onactivityresult]
+
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -143,7 +150,7 @@ class MainActivity : BaseActivity() {
 
     private fun signOut() {
         // Firebase sign out
-       // auth.signOut()
+        // auth.signOut()
 
         // Google sign out
         googleSignInClient.signOut().addOnCompleteListener(this) {
@@ -170,9 +177,7 @@ class MainActivity : BaseActivity() {
             Log.d("Tag", user.email)*/
 
 
-            var homeViewModel: HomeViewModel
-            homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel::class.java)
+            val homeViewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
             val root = layoutInflater.inflate(R.layout.fragment_home, container, false)
             val textView: TextView = root.findViewById(R.id.text_home)
             homeViewModel.text.observe(this, Observer {
@@ -189,4 +194,23 @@ class MainActivity : BaseActivity() {
         private const val TAG = "GoogleActivity"
         private const val RC_SIGN_IN = 9001
     }
+
+    @IgnoreExtraProperties
+    data class User(
+        var username: String? = "",
+        var email: String? = "", var profile: String? = "", var amount: Int? = 0
+    )
+
+
+    private fun NewUser(name: String, email: String?, profile: String?) {
+        database = FirebaseDatabase.getInstance().reference
+        var amount= 0
+        val user = User(name, email, profile, amount)
+      // database.child("users").child(email.toString()).setValue(user)
+        if (email != null) {
+            database.child("users").child(email)
+        }
+    }
+
+
 }
