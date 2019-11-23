@@ -21,9 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.IgnoreExtraProperties
+import com.google.firebase.database.*
 import com.nightowldevelopers.richierich.ui.home.HomeViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -64,16 +62,33 @@ class MainActivity : BaseActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-     // signIn()
+
         if (currentUser != null) {
-            var name = currentUser.displayName
-            var Email= currentUser.email
-            var ProfileUrl = currentUser.photoUrl
-            NewUser(
-                currentUser.displayName.toString(),
-                currentUser.email.toString(),
-                currentUser.photoUrl.toString()
-            )
+            database = FirebaseDatabase.getInstance().reference
+            currentUser?.let { user ->
+
+                val userNameRef = database.child("users")?.orderByChild("email")?.equalTo(user.email)
+                val eventListener = object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) = if (!dataSnapshot.exists()) {
+                        //create new user
+                        NewUser(
+                            currentUser.displayName.toString(),
+                            currentUser.email.toString(),
+                            currentUser.photoUrl.toString()
+                        )
+
+                    } else {
+                        //user found!!
+                    }
+                    override fun onCancelled(databaseError: DatabaseError) {
+                    }
+                }
+                userNameRef?.addListenerForSingleValueEvent(eventListener)
+            }
+
+        }
+        else{
+            signIn()
         }
 
 
@@ -205,10 +220,11 @@ class MainActivity : BaseActivity() {
     private fun NewUser(name: String, email: String?, profile: String?) {
         database = FirebaseDatabase.getInstance().reference
         var amount= 0
+        var username= email?.split("@")?.first()
         val user = User(name, email, profile, amount)
-      // database.child("users").child(email.toString()).setValue(user)
+        database.child("users").child(username.toString()).setValue(user)
         if (email != null) {
-            database.child("users").child(email)
+            database.child("users").child(username.toString())
         }
     }
 
